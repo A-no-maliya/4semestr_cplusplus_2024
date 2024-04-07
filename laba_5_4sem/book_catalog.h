@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #ifndef BOOK_CATALOG_H
 #define BOOK_CATALOG_H
 
