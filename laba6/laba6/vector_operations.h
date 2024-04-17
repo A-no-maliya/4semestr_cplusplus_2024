@@ -38,3 +38,20 @@ int findElementIndex(const std::vector<int>& vec, int element);
 void removeDuplicates(std::vector<int>& vec);
 
 #endif /* VECTOR_OPERATIONS_H */
+
+
+/*readFromFile(std::vector<int>& vec, const std::string& filename) - открывает файл, считывает целые числа из него и добавляет их в вектор.
+
+reverseVector(std::vector<int>& vec) - реверсирует порядок элементов в векторе.
+
+findMinElement(const std::vector<int>& vec) - находит минимальный элемент в векторе.
+
+removeEvenNumbers(std::vector<int>& vec) - удаляет все четные элементы из вектора.
+
+sortVector(std::vector<int>& vec, bool ascending) - сортирует вектор в убывающем или возрастающем порядке в зависимости от значения ascending.
+
+insertElement(std::vector<int>& vec, int element) - вставляет элемент в вектор, сохраняя сортировку.
+
+findElementIndex(const std::vector<int>& vec, int element) - находит индекс заданного элемента в векторе.
+
+removeDuplicates(std::vector<int>& vec) - удаляет дублированные элементы из вектора.*/
