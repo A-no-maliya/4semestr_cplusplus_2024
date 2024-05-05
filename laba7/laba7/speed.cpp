@@ -1,43 +1,43 @@
 #include <iostream> 
 #include <vector>   
 #include <list>     
-#include <chrono>   // Для измерения времени выполнения
-#include <iomanip>  // Для форматирования вывода
-#include <memory>   // Для работы с памятью
+#include <chrono>   // Р”Р»СЏ РёР·РјРµСЂРµРЅРёСЏ РІСЂРµРјРµРЅРё РІС‹РїРѕР»РЅРµРЅРёСЏ
+#include <iomanip>  // Р”Р»СЏ С„РѕСЂРјР°С‚РёСЂРѕРІР°РЅРёСЏ РІС‹РІРѕРґР°
+#include <memory>   // Р”Р»СЏ СЂР°Р±РѕС‚С‹ СЃ РїР°РјСЏС‚СЊСЋ
 
 int main() {
     std::setlocale(LC_ALL, "Russian"); 
 
-    const int numElements = 100000; // Определяем количество элементов для вставки
+    const int numElements = 100000; // РћРїСЂРµРґРµР»СЏРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РґР»СЏ РІСЃС‚Р°РІРєРё
 
-    // Работа с вектором
-    std::vector<int> vector;                                                    // Создаём вектор типа int
-    auto start = std::chrono::high_resolution_clock::now();                     // Запоминаем начальное время
-    for (int i = 0; i < numElements; ++i) {                                     // Цикл для вставки элементов
-        vector.insert(vector.begin(), i);                                       // Вставляем в начало вектора, что обычно медленно
+    // Р Р°Р±РѕС‚Р° СЃ РІРµРєС‚РѕСЂРѕРј
+    std::vector<int> vector;                                                    // РЎРѕР·РґР°С‘Рј РІРµРєС‚РѕСЂ С‚РёРїР° int
+    auto start = std::chrono::high_resolution_clock::now();                     // Р—Р°РїРѕРјРёРЅР°РµРј РЅР°С‡Р°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
+    for (int i = 0; i < numElements; ++i) {                                     // Р¦РёРєР» РґР»СЏ РІСЃС‚Р°РІРєРё СЌР»РµРјРµРЅС‚РѕРІ
+        vector.insert(vector.begin(), i);                                       // Р’СЃС‚Р°РІР»СЏРµРј РІ РЅР°С‡Р°Р»Рѕ РІРµРєС‚РѕСЂР°, С‡С‚Рѕ РѕР±С‹С‡РЅРѕ РјРµРґР»РµРЅРЅРѕ
     }
-    auto end = std::chrono::high_resolution_clock::now();                                               // Запоминаем конечное время
-    std::chrono::duration<double> vectorTime = end - start;                                             // Вычисляем длительность операции
-    std::cout << "Время вставки в начало вектора: " << vectorTime.count() << " секунд" << std::endl;    // Выводим время
+    auto end = std::chrono::high_resolution_clock::now();                                               // Р—Р°РїРѕРјРёРЅР°РµРј РєРѕРЅРµС‡РЅРѕРµ РІСЂРµРјСЏ
+    std::chrono::duration<double> vectorTime = end - start;                                             // Р’С‹С‡РёСЃР»СЏРµРј РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С†РёРё
+    std::cout << "Р’СЂРµРјСЏ РІСЃС‚Р°РІРєРё РІ РЅР°С‡Р°Р»Рѕ РІРµРєС‚РѕСЂР°: " << vectorTime.count() << " СЃРµРєСѓРЅРґ" << std::endl;    // Р’С‹РІРѕРґРёРј РІСЂРµРјСЏ
 
-    // Работа со списком
-    std::list<int> list;                                                        // Создаём список типа int
-    start = std::chrono::high_resolution_clock::now();                          // Запоминаем начальное время
-    for (int i = 0; i < numElements; ++i) {                                     // Цикл для вставки элементов
-        list.push_front(i);                                                     // Вставка в начало списка, что обычно быстрее
+    // Р Р°Р±РѕС‚Р° СЃРѕ СЃРїРёСЃРєРѕРј
+    std::list<int> list;                                                        // РЎРѕР·РґР°С‘Рј СЃРїРёСЃРѕРє С‚РёРїР° int
+    start = std::chrono::high_resolution_clock::now();                          // Р—Р°РїРѕРјРёРЅР°РµРј РЅР°С‡Р°Р»СЊРЅРѕРµ РІСЂРµРјСЏ
+    for (int i = 0; i < numElements; ++i) {                                     // Р¦РёРєР» РґР»СЏ РІСЃС‚Р°РІРєРё СЌР»РµРјРµРЅС‚РѕРІ
+        list.push_front(i);                                                     // Р’СЃС‚Р°РІРєР° РІ РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°, С‡С‚Рѕ РѕР±С‹С‡РЅРѕ Р±С‹СЃС‚СЂРµРµ
     }
-    end = std::chrono::high_resolution_clock::now();                                                // Запоминаем конечное время
-    std::chrono::duration<double> listTime = end - start;                                           // Вычисляем длительность операции
-    std::cout << "Время вставки в начало списка: " << listTime.count() << " секунд" << std::endl;   // Выводим время
+    end = std::chrono::high_resolution_clock::now();                                                // Р—Р°РїРѕРјРёРЅР°РµРј РєРѕРЅРµС‡РЅРѕРµ РІСЂРµРјСЏ
+    std::chrono::duration<double> listTime = end - start;                                           // Р’С‹С‡РёСЃР»СЏРµРј РґР»РёС‚РµР»СЊРЅРѕСЃС‚СЊ РѕРїРµСЂР°С†РёРё
+    std::cout << "Р’СЂРµРјСЏ РІСЃС‚Р°РІРєРё РІ РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°: " << listTime.count() << " СЃРµРєСѓРЅРґ" << std::endl;   // Р’С‹РІРѕРґРёРј РІСЂРµРјСЏ
 
-    // Оценка объёма используемой памяти
-    size_t vectorMemoryUsage = vector.capacity() * sizeof(int);                                         // Вычисляем объём памяти, занимаемый вектором
-    size_t listMemoryUsage = list.size() * sizeof(int) + list.size() * 2 * sizeof(void*);               // Учтём двойные ссылки в списке
+    // РћС†РµРЅРєР° РѕР±СЉС‘РјР° РёСЃРїРѕР»СЊР·СѓРµРјРѕР№ РїР°РјСЏС‚Рё
+    size_t vectorMemoryUsage = vector.capacity() * sizeof(int);                                         // Р’С‹С‡РёСЃР»СЏРµРј РѕР±СЉС‘Рј РїР°РјСЏС‚Рё, Р·Р°РЅРёРјР°РµРјС‹Р№ РІРµРєС‚РѕСЂРѕРј
+    size_t listMemoryUsage = list.size() * sizeof(int) + list.size() * 2 * sizeof(void*);               // РЈС‡С‚С‘Рј РґРІРѕР№РЅС‹Рµ СЃСЃС‹Р»РєРё РІ СЃРїРёСЃРєРµ
 
-    // Устанавливаем точность вывода и выводим используемый объём памяти
+    // РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј С‚РѕС‡РЅРѕСЃС‚СЊ РІС‹РІРѕРґР° Рё РІС‹РІРѕРґРёРј РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ РѕР±СЉС‘Рј РїР°РјСЏС‚Рё
     std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Объём памяти, занимаемый вектором: " << vectorMemoryUsage / (1024.0 * 1024.0) << " МБ" << std::endl;
-    std::cout << "Объём памяти, занимаемый списком: " << listMemoryUsage / (1024.0 * 1024.0) << " МБ" << std::endl;
+    std::cout << "РћР±СЉС‘Рј РїР°РјСЏС‚Рё, Р·Р°РЅРёРјР°РµРјС‹Р№ РІРµРєС‚РѕСЂРѕРј: " << vectorMemoryUsage / (1024.0 * 1024.0) << " РњР‘" << std::endl;
+    std::cout << "РћР±СЉС‘Рј РїР°РјСЏС‚Рё, Р·Р°РЅРёРјР°РµРјС‹Р№ СЃРїРёСЃРєРѕРј: " << listMemoryUsage / (1024.0 * 1024.0) << " РњР‘" << std::endl;
 
     return 0;
 }
