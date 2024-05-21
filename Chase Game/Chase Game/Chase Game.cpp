@@ -18,7 +18,7 @@ public:
     }
 
     int distanceTo(const Point2D& other) const {
-        return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+        return static_cast<int>(std::sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y)));
     }
 };
 
@@ -103,7 +103,13 @@ public:
         : width(width), height(height), movesLimit(movesLimit), prey(), predator() {
         std::srand(std::time(NULL));
         prey.setPosition(std::rand() % width, std::rand() % height);
-        predator.setPosition(std::rand() % width, std::rand() % height);
+
+        int max_distance = static_cast<int>(std::sqrt(width * width + height * height)) / 2;
+        int distance = std::rand() % max_distance + 1;
+
+        do {
+            predator.setPosition(std::rand() % width, std::rand() % height);
+        } while (prey.getPosition().distanceTo(predator.getPosition()) < distance);
     }
 
     void display() const {
