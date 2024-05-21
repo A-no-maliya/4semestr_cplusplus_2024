@@ -1,151 +1,297 @@
 #include <iostream>
-#include <iomanip>
-#include <conio.h>
-#include <random>
-#include <Windows.h>
-#include <cassert>
-#include "Character.h"
-#include "Arena.h"
-#include "Predator.h"
-#include "Prey.h"
-#include "Console.h"
+#include <windows.h>  // для Sleep()
+#include <ctime>  // для std::time и std::srand
+#include <cstdlib>  // для std::rand и std::abs
 
-unsigned int ask_distance() {
-	unsigned int distance;
-	setCursorPosition(35, 35);
-	std::cout << "Дистанция: "; std::cin >> distance;
-	assert(std::cin); // Убеждаемся, что ввели не букву, а цифру
-	setCursorPosition(0, 0);
-	return distance;
-}
+using namespace std;
 
-int main()
-{
-	unsigned short int player_choice;
-	char dir_choice = ' ';
-	bool game_over = false;
-	Arena arena(30, 30);
-	Predator predator(1, 1);
-	Prey prey(15, 15);
-	// Инициализация всего, что потребуется
-	arena.placeCharacter(predator, "**");
-	arena.placeCharacter(prey, "()");
+class Point2D {
+public:
+    int x;
+    int y;
 
-	std::cout << "Выбери игрока:\n1 --- Жертва ()\n2 --- Охотник **\nВыбор: ";
-	std::cin >> player_choice;
-	assert(std::cin); // Убеждаемся, что ввели не букву, а цифру
-	
-	setCursorPosition(0, 0);
-	switch (player_choice)
-	{
-	case 2:
-		arena.Draw();
-		while (!game_over) {
-			// Пока не конец игры
-			unsigned int distance = 0; // Инициализируем дистанцию
-			dir_choice = _getch(); // Получаем направление движения без нажатия Enter
+    Point2D(int x = 0, int y = 0) : x(x), y(y) {}
 
-			// Получаем предыдущие координаты
-			int prev_x = predator.getPosition().x;
-			int prev_y = predator.getPosition().y;
+    void move(int dx, int dy) {
+        x += dx;
+        y += dy;
+    }
 
-			//Инициализируем новую точку
-			Point2D new_pos(prev_x, prev_y);
-			setCursorPosition(0, 0);
-			switch (dir_choice) {
+    int distanceTo(const Point2D& other) const {
+        return sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y));
+    }
+};
 
-			case 'w':
-				distance = ask_distance();
-				if (distance <= 3) {
-					prev_y -= distance;	
-				}
-				break;
+class Character {
+public:
+    Point2D position;
 
-			case 'a':
-				distance = ask_distance();
-				if (distance <= 3) {
-					prev_x -= distance;
-				}
-				break;
+    Character(int x = 0, int y = 0) : position(x, y) {}
 
-			case 'x':
-				distance = ask_distance();
-				if (distance <= 3) {
-					prev_y += distance;
-				}
-				break;
+    void setPosition(int x, int y) {
+        position.x = x;
+        position.y = y;
+    }
 
-			case 'd':
-				distance = ask_distance();
-				if (distance <= 3) {
-					prev_x += distance;
-				}
-				break;
+    Point2D getPosition() const {
+        return position;
+    }
 
-			case 'l':
-				setCursorPosition(40, 40);
-				std::cout << "Выключение... ";
-				exit(0);
-			default:
-				break;
-			}
-			new_pos.Change_coords(prev_x, prev_y);
-			predator.Move(new_pos, arena);
-			prey.moveRandomly(arena);
+    virtual void move(int dx, int dy) {
+        position.move(dx, dy);
+    }
+};
 
-			arena.Draw();
-			Point2D pred_pos = predator.getPosition();
-			Point2D prey_pos = prey.getPosition();
+class Prey : public Character {
+public:
+    Prey(int x = 0, int y = 0) : Character(x, y) {}
 
-			// Если расстояние между игроками < 2, игра окончена
-			game_over = sqrt(pow((pred_pos.x - prey_pos.x), 2) + pow((pred_pos.y - prey_pos.y), 2)) <= 2.0;
-		}
-		std::cout << "Ты выиграл! ";
-		break;
+    void autoMove(int width, int height) {
+        // Логика автоматического движения жертвы 
+        int random = std::rand() % 4;
+        switch (random) {
+        case 0: move(0, 1); break;    // двигается вниз
+        case 1: move(0, -1); break;   // двигается вверх
+        case 2: move(1, 0); break;    // двигается вправо
+        case 3: move(-1, 0); break;   // двигается влево
+        }
 
-	case 1:
-		arena.Draw();
-		while (!game_over) {
-			unsigned int distance = 0;
-			dir_choice = _getch();
-			int prev_x = prey.getPosition().x;
-			int prev_y = prey.getPosition().y;
-			Point2D new_pos(prev_x, prev_y);
-			setCursorPosition(0, 0);
-			switch (dir_choice) {
+        // Проверка границ, чтобы жертва не вышла за пределы арены
+        if (position.x < 0)
+            position.x = 0;
+        else if (position.x >= width)
+            position.x = width - 1;
 
-			case 'q': prev_x--; prev_y--; break;
-			case 'w':           prev_y--; break;
-			case 'e': prev_x++; prev_y--; break;
-			case 'd': prev_x++;           break;
-			case 'c': prev_x++; prev_y++; break;
-			case 'x':           prev_y++; break;
-			case 'z': prev_x--; prev_y++; break;
-			case 'a': prev_x--;           break;
-			case 'l':
-				setCursorPosition(40, 40);
-				std::cout << "Выключение... ";
-				exit(0);
-			default:
-				break;
-			}
-			setCursorPosition(0, 0);
-			new_pos.Change_coords(prev_x, prev_y);
-			prey.Move(new_pos, arena);
-			
-			predator.moveTowards(prey.getPosition(), arena);
-			setCursorPosition(0, 0);
-			arena.Draw();
-			Point2D pred_pos = predator.getPosition();
-			Point2D prey_pos = prey.getPosition();
+        if (position.y < 0)
+            position.y = 0;
+        else if (position.y >= height)
+            position.y = height - 1;
+    }
+};
 
-			game_over = sqrt(pow((pred_pos.x - prey_pos.x), 2) + pow((pred_pos.y - prey_pos.y), 2)) <= 1.0;
-		}
-		std::cout << "Ты проиграл... ";
-		break;
+class Predator : public Character {
+public:
+    Predator(int x = 0, int y = 0) : Character(x, y) {}
 
-	default:
-		std::cout << "Нет такой опции!\n";
-		break;
-	}
+    void moveTowardPrey(const Point2D& preyPos) {
+        // Логика движения по направлению к жертве
+        int step = 1; // Маленький шаг для более точного перемещения
+        if (abs(preyPos.x - position.x) > abs(preyPos.y - position.y)) {
+            if (preyPos.x < position.x)
+                position.x -= step;
+            else
+                position.x += step;
+        }
+        else {
+            if (preyPos.y < position.y)
+                position.y -= step;
+            else
+                position.y += step;
+        }
+    }
+};
+
+class Arena {
+public:
+    const int width;
+    const int height;
+    const int movesLimit;
+    Prey prey;
+    Predator predator;
+
+    Arena(int width, int height, int movesLimit)
+        : width(width), height(height), movesLimit(movesLimit), prey(), predator() {
+        std::srand(std::time(NULL));
+        prey.setPosition(std::rand() % width, std::rand() % height);
+        predator.setPosition(std::rand() % width, std::rand() % height);
+    }
+
+    void display() const {
+        system("cls");
+        for (int y = 0; y < height; ++y) {
+            for (int x = 0; x < width; ++x) {
+                if (x == predator.getPosition().x && y == predator.getPosition().y)
+                    std::cout << "H "; // HUNTER (хищник)
+                else if (x == prey.getPosition().x && y == prey.getPosition().y)
+                    std::cout << "P "; // PREY (жертва)
+                else
+                    std::cout << ". ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << "Prey - P    Predator - H" << std::endl;
+    }
+
+    bool checkCollision() const {
+        return prey.getPosition().x == predator.getPosition().x && prey.getPosition().y == predator.getPosition().y;
+    }
+};
+
+int main() {
+    std::setlocale(LC_ALL, "Russian");
+
+    int width, height, movesLimit;
+
+    // Ввод параметров поля игры
+    std::cout << "Введите ширину поля: ";
+    std::cin >> width;
+    std::cout << "Введите высоту поля: ";
+    std::cin >> height;
+    std::cout << "Максимальное количество ходов: ";
+    std::cin >> movesLimit;
+
+    if (width <= 0 || height <= 0 || movesLimit <= 0) {
+        std::cout << "Неверные параметры. Завершение работы программы." << std::endl;
+        return 1;
+    }
+
+    Arena arena(width, height, movesLimit);
+    bool validUserInput;
+    char ch;
+
+    do {
+        validUserInput = true;
+        std::cout << "Выберите героя:" << std::endl;
+        std::cout << "1. Хищник" << std::endl;
+        std::cout << "2. Жертва" << std::endl;
+        std::cin >> ch;
+
+        if (ch == '1') {
+            std::cout << "Хищник" << std::endl;
+            std::srand(std::time(nullptr));
+            int limit = movesLimit;
+
+            while (limit > 0) {
+                arena.display();
+                int step;
+                std::cout << "Сколько шагов (1, 2, 3): ";
+                std::cin >> step;
+                if (step != 1 && step != 2 && step != 3) {
+                    step = 1;
+                }
+
+                char direction;
+                std::cout << "Направление:" << std::endl;
+                std::cout << "               w - вверх" << std::endl;
+                std::cout << "a - налево    s - вниз   d - направо" << std::endl;
+                std::cin >> direction;
+
+                switch (direction) {
+                case 'w':
+                    arena.predator.move(0, -step);
+                    break;
+                case 's':
+                    arena.predator.move(0, step);
+                    break;
+                case 'a':
+                    arena.predator.move(-step, 0);
+                    break;
+                case 'd':
+                    arena.predator.move(step, 0);
+                    break;
+                }
+
+                // Проверка границ
+                if (arena.predator.getPosition().x < 0)
+                    arena.predator.setPosition(0, arena.predator.getPosition().y);
+                else if (arena.predator.getPosition().x >= width)
+                    arena.predator.setPosition(width - 1, arena.predator.getPosition().y);
+
+                if (arena.predator.getPosition().y < 0)
+                    arena.predator.setPosition(arena.predator.getPosition().x, 0);
+                else if (arena.predator.getPosition().y >= height)
+                    arena.predator.setPosition(arena.predator.getPosition().x, height - 1);
+
+                if (arena.checkCollision()) {
+                    std::cout << "ИГРА ОКОНЧЕНА. ВЫ ПРОИГРАЛИ" << std::endl;
+                    Sleep(5000);
+                    break;
+                }
+
+                arena.prey.autoMove(width, height);
+
+                if (arena.checkCollision()) {
+                    std::cout << "ИГРА ОКОНЧЕНА. ВЫ ПРОИГРАЛИ" << std::endl;
+                    Sleep(5000);
+                    break;
+                }
+
+                --limit;
+            }
+        }
+        else if (ch == '2') {
+            std::cout << "Жертва" << std::endl;
+            std::srand(std::time(nullptr));
+            int limit = movesLimit;
+
+            while (limit > 0) {
+                arena.display();
+
+                if (arena.checkCollision()) {
+                    std::cout << "ИГРА ОКОНЧЕНА. ВЫ ВЫЙГРАЛИ" << std::endl;
+                    Sleep(5000);
+                    break;
+                }
+
+                char direction;
+                std::cout << "Направление:" << std::endl;
+                std::cout << "q - влево-вверх    w - вверх    e - вправо-вверх" << std::endl;
+                std::cout << "a - влево          s - вниз      d - вправо" << std::endl;
+                std::cout << "z - влево-вниз               c - вправо-вниз" << std::endl;
+
+                std::cin >> direction;
+
+                switch (direction) {
+                case 'w':
+                    arena.prey.move(0, -1);
+                    break;
+                case 's':
+                    arena.prey.move(0, 1);
+                    break;
+                case 'a':
+                    arena.prey.move(-1, 0);
+                    break;
+                case 'd':
+                    arena.prey.move(1, 0);
+                    break;
+                case 'q':
+                    arena.prey.move(-1, -1);
+                    break;
+                case 'e':
+                    arena.prey.move(1, -1);
+                    break;
+                case 'z':
+                    arena.prey.move(-1, 1);
+                    break;
+                case 'c':
+                    arena.prey.move(1, 1);
+                    break;
+                }
+
+                // Проверка границ
+                if (arena.prey.getPosition().x < 0)
+                    arena.prey.setPosition(0, arena.prey.getPosition().y);
+                else if (arena.prey.getPosition().x >= width)
+                    arena.prey.setPosition(width - 1, arena.prey.getPosition().y);
+
+                if (arena.prey.getPosition().y < 0)
+                    arena.prey.setPosition(arena.prey.getPosition().x, 0);
+                else if (arena.prey.getPosition().y >= height)
+                    arena.prey.setPosition(arena.prey.getPosition().x, height - 1);
+
+                arena.predator.moveTowardPrey(arena.prey.getPosition());
+
+                if (arena.checkCollision()) {
+                    std::cout << "ИГРА ОКОНЧЕНА. ВЫ ПРОИГРАЛИ" << std::endl;
+                    Sleep(5000);
+                    break;
+                }
+
+                --limit;
+            }
+        }
+        else {
+            validUserInput = false;
+        }
+    } while (!validUserInput);
 }
